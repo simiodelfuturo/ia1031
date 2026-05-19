@@ -1,0 +1,36 @@
+# Nemi — Asistente de Orientación en Crisis
+
+## ¿Qué es Nemi?
+Nemi es un asistente conversacional de orientación y triage emocional para público general en México. Está representado por un ajolote y su nombre viene del náhuatl: "vivir y caminar".
+
+## ¿Por qué usamos AI?
+La inteligencia artificial permite que Nemi procese lenguaje natural para identificar el dominio de malestar predominante de una persona en crisis, orientarla hacia los recursos de apoyo correctos y generar un reporte clínico estructurado para el profesionista que la atienda después.
+
+Sin AI, este proceso requeriría un profesionista disponible en tiempo real. Con AI, Nemi puede operar como primera línea de contacto las 24 horas, reduciendo la barrera de acceso a orientación en salud mental y crisis.
+
+## ¿Para qué usamos AI?
+- Identificar el dominio de origen del malestar según el Modelo RADAR 5 (Biológico, Material, Trauma, Relacional, Psicológico/Significado)
+- Orientar al usuario hacia recursos específicos según su situación (tipo de seguro médico, género, tipo de crisis)
+- Detectar riesgo de vida y activar protocolo de crisis con recursos de emergencia
+- Generar un reporte clínico con formulación breve, nivel de riesgo y fragmentos relevantes
+- Producir un código QR descargable que el usuario puede mostrar al profesionista que lo atienda
+
+## Guardrails implementados
+- Bloqueo de diagnósticos y nombres de enfermedades mentales
+- Prohibición de recomendar medicamentos
+- Protocolo obligatorio ante riesgo de vida (Línea de la Vida 800 290 0024)
+- Límite de 15 turnos por sesión
+- Cierre automático por inactividad (10 minutos)
+- Manejo de filtro de contenido de Azure para contenido sensible
+
+## Stack técnico
+- Python + Flask
+- Azure OpenAI (gpt-4o)
+- HTML / CSS / JavaScript vanilla
+
+## Configuración
+1. Clona el repositorio
+2. Crea un archivo `.env` basado en `.env.example`
+3. Instala dependencias: `pip install -r requirements.txt`
+4. Corre el servidor: `python app.py`
+5. Abre `http://127.0.0.1:5000` en el navegador

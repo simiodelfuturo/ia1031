@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nemi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f1117;
+            color: #e0e0e0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #container {
+            width: 100%;
+            max-width: 640px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        h1 { text-align: center; font-size: 1.4rem; color: #a78bfa; margin-bottom: 16px; letter-spacing: 2px; }
+        #chat {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 12px;
+            background: #1a1d27;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; line-height: 1.5; font-size: 0.95rem; }
+        .nemi { background: #2d2f45; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user { background: #5b21b6; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .aviso { background: #3a2f10; align-self: center; font-size: 0.85rem; color: #fbbf24; text-align: center; max-width: 90%; }
+        #input-area { display: flex; gap: 10px; }
+        #user-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #3a3d55;
+            background: #1a1d27;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        #user-input:focus { border-color: #a78bfa; }
+        button { padding: 12px 20px; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; }
+        button:hover { background: #6d28d9; }
+        button:disabled { background: #3a3d55; cursor: not-allowed; }
+        #end-btn { background: #3a3d55; }
+        #end-btn:hover { background: #4a4d65; }
+        #reporte-container { display: none; margin-top: 16px; background: #1a1d27; border-radius: 12px; padding: 16px; font-size: 0.9rem; }
+        #reporte-container h2 { color: #a78bfa; margin-bottom: 12px; font-size: 1rem; }
+        .reporte-campo { margin-bottom: 10px; }
+        .reporte-label { color: #a78bfa; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
+        .reporte-valor { margin-top: 4px; line-height: 1.5; }
+        .riesgo-bajo { color: #34d399; }
+        .riesgo-medio { color: #fbbf24; }
+        .riesgo-alto { color: #f97316; }
+        .riesgo-crisis { color: #ef4444; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>🫧 NEMI</h1>
+<p style="text-align:center; color:#a0a0b0; font-size:0.88rem; margin-bottom:12px; line-height:1.6;">
+    Nemi es un asistente de orientacion. Cuentale lo que te pasa y te ayudara a encontrar apoyo.<br>
+    Al terminar, se genera un codigo que puedes mostrar al profesionista que te atienda.
+</p>
+        <div id="chat"></div>
+        <div id="input-area">
+            <button id="end-btn" onclick="terminarSesion()">Terminar y ver mi orientacion</button>
+            <input id="user-input" type="text" placeholder="Escribe aqui..." autocomplete="off" />
+            <button id="send-btn" onclick="sendMessage()">Enviar</button>
+        </div>
+        <div id="reporte-container">
+            <h2>Reporte de Sesion</h2>
+            <div id="reporte-contenido"></div>
+        </div>
+    </div>
+
+    <script>
+        const sessionId = Math.random().toString(36).substring(2);
+        const chat = document.getElementById("chat");
+        const input = document.getElementById("user-input");
+        const btn = document.getElementById("send-btn");
+        let inactivoAviso = null;
+        let inactivoCierre = null;
+        let sesionCerrada = false;
+
+        function addMessage(text, role) {
+            const div = document.createElement("div");
+            div.className = `msg ${role}`;
+            div.textContent = text;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        addMessage("Hola, soy Nemi 🫧 — estoy aqui para escucharte y orientarte. Cuentame lo que te pasa. Cuando terminemos, te dare un codigo QR que puedes mostrar al profesionista que te atienda. ¿Como te puedo ayudar hoy?", "nemi");
+
+        input.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") sendMessage();
+        });
+
+        function resetInactividad() {
+            clearTimeout(inactivoAviso);
+            clearTimeout(inactivoCierre);
+            if (sesionCerrada) return;
+
+            inactivoAviso = setTimeout(async () => {
+                const res = await fetch("/inactividad", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ session_id: sessionId, tipo: "aviso" })
+                });
+                const data = await res.json();
+                if (data.ok) addMessage(data.message, "aviso");
+            }, 7 * 60 * 1000);
+
+            inactivoCierre = setTimeout(async () => {
+                await fetch("/inactividad", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ session_id: sessionId, tipo: "cierre" })
+                });
+                cerrarSesion();
+            }, 10 * 60 * 1000);
+        }
+
+        async function cerrarSesion() {
+            if (sesionCerrada) return;
+            sesionCerrada = true;
+            input.disabled = true;
+            btn.disabled = true;
+            document.getElementById("end-btn").disabled = true;
+            addMessage("La sesion ha terminado. Generando reporte...", "aviso");
+            await generarReporte();
+        }
+
+        async function terminarSesion() {
+            if (sesionCerrada) return;
+            await cerrarSesion();
+        }
+
+        async function generarReporte() {
+            const res = await fetch("/reporte", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ session_id: sessionId })
+            });
+            const data = await res.json();
+            mostrarReporte(data);
+        }
+
+        function mostrarReporte(r) {
+            const contenedor = document.getElementById("reporte-container");
+            const contenido = document.getElementById("reporte-contenido");
+            contenedor.style.display = "block";
+
+            const dominiosSecundarios = r.dominios_secundarios && r.dominios_secundarios.length > 0
+                ? r.dominios_secundarios.join(", ") : "Ninguno";
+            const recursos = r.recursos_proporcionados && r.recursos_proporcionados.length > 0
+                ? "• " + r.recursos_proporcionados.join("<br>• ") : "Ninguno";
+            const fragmentos = r.fragmentos_relevantes && r.fragmentos_relevantes.length > 0
+                ? r.fragmentos_relevantes.map(f => `"${f}"`).join("<br>") : "Ninguno";
+            const riesgoClass = `riesgo-${r.nivel_riesgo}`;
+
+            const qrHtml = r.qr ? `
+                <div class="reporte-campo">
+                    <div class="reporte-label">Codigo QR del reporte</div>
+                    <div class="reporte-valor">
+                        <img src="data:image/png;base64,${r.qr}" style="width:150px;height:150px;margin-top:8px;" />
+                        <br><small style="color:#a78bfa">${r.url_reporte}</small>
+                    </div>
+                </div>` : "";
+
+            contenido.innerHTML = `
+                <div class="reporte-campo">
+                    <div class="reporte-label">Fecha y hora</div>
+                    <div class="reporte-valor">${r.fecha_hora} — Duracion: ${r.duracion_minutos} min — Turnos: ${r.total_turnos}</div>
+                </div>
+                <div class="reporte-campo">
+                    <div class="reporte-label">Dominio principal</div>
+                    <div class="reporte-valor">${r.dominio_principal}</div>
+                </div>
+                <div class="reporte-campo">
+                    <div class="reporte-label">Dominios secundarios</div>
+                    <div class="reporte-valor">${dominiosSecundarios}</div>
+                </div>
+                <div class="reporte-campo">
+                    <div class="reporte-label">Nivel de riesgo</div>
+                    <div class="reporte-valor ${riesgoClass}">${r.nivel_riesgo ? r.nivel_riesgo.toUpperCase() : ""}</div>
+                </div>
+                <div class="reporte-campo">
+                    <div class="reporte-label">Motivo de consulta</div>
+                    <div class="reporte-valor">${r.motivo_consulta}</div>
+                </div>
+                <div class="reporte-campo">
+                    <div class="reporte-label">Recursos proporcionados</div>
+                    <div class="reporte-valor">${recursos}</div>
+                </div>
+                <div class="reporte-campo">
+                    <div class="reporte-label">Formulacion clinica</div>
+                    <div class="reporte-valor">${r.formulacion_clinica}</div>
+                </div>
+                <div class="reporte-campo">
+                    <div class="reporte-label">Fragmentos relevantes</div>
+                    <div class="reporte-valor">${fragmentos}</div>
+                </div>
+                ${qrHtml}
+            `;
+        }
+
+        async function sendMessage() {
+            if (sesionCerrada) return;
+            const message = input.value.trim();
+            if (!message) return;
+            input.value = "";
+            btn.disabled = true;
+            addMessage(message, "user");
+            resetInactividad();
+
+            try {
+                const res = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ session_id: sessionId, message })
+                });
+                const data = await res.json();
+                addMessage(data.response, "nemi");
+
+                if (data.cerrada) {
+                    await cerrarSesion();
+                }
+            } catch (err) {
+                addMessage("Hubo un error. Intenta de nuevo.", "nemi");
+            }
+
+            btn.disabled = false;
+            input.focus();
+        }
+
+        resetInactividad();
+    </script>
+</body>
+</html>
