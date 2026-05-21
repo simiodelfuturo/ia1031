@@ -71,14 +71,17 @@
 <body>
     <div id="container">
         <h1>🫧 NEMI</h1>
-<p style="text-align:center; color:#a0a0b0; font-size:0.88rem; margin-bottom:12px; line-height:1.6;">
-    Nemi es un asistente de orientacion. Cuentale lo que te pasa y te ayudara a encontrar apoyo.<br>
-    Al terminar, se genera un codigo que puedes mostrar al profesionista que te atienda.
+<p style="text-align:center; color:#a0a0b0; font-size:0.88rem; margin-bottom:8px; line-height:1.6;">
+    Nemi es un asistente de orientación. Cuéntale lo que te pasa y te ayudará a encontrar apoyo.<br>
+    Al terminar, se genera un código que puedes mostrar al profesionista que te atienda.
+</p>
+<p style="text-align:center; color:#6b6b80; font-size:0.78rem; margin-bottom:12px; line-height:1.5;">
+    ⚠️ Nemi es una herramienta de orientación y puede cometer errores. No sustituye la atención de un profesionista de salud.
 </p>
         <div id="chat"></div>
         <div id="input-area">
-            <button id="end-btn" onclick="terminarSesion()">Terminar y ver mi orientacion</button>
-            <input id="user-input" type="text" placeholder="Escribe aqui..." autocomplete="off" />
+            <button id="end-btn" onclick="terminarSesion()">Terminar y ver mi orientación</button>
+            <input id="user-input" type="text" placeholder="Escribe aquí..." autocomplete="off" />
             <button id="send-btn" onclick="sendMessage()">Enviar</button>
         </div>
         <div id="reporte-container">
@@ -104,7 +107,7 @@
             chat.scrollTop = chat.scrollHeight;
         }
 
-        addMessage("Hola, soy Nemi 🫧 — estoy aqui para escucharte y orientarte. Cuentame lo que te pasa. Cuando terminemos, te dare un codigo QR que puedes mostrar al profesionista que te atienda. ¿Como te puedo ayudar hoy?", "nemi");
+        addMessage("Hola, soy Nemi 🫧 — estoy aquí para escucharte y orientarte. Cuéntame lo que te pasa. Cuando terminemos, te daré un código QR que puedes mostrar al profesionista que te atienda. ¿Cómo te puedo ayudar hoy?", "nemi");
 
         input.addEventListener("keydown", function(e) {
             if (e.key === "Enter") sendMessage();
@@ -183,6 +186,9 @@
                 </div>` : "";
 
             contenido.innerHTML = `
+            <div class="reporte-campo" style="background:#2a1f1f; border-left: 3px solid #f97316; padding: 10px 14px; border-radius:6px; margin-bottom:14px;">
+                    <div class="reporte-valor" style="color:#f97316; font-size:0.85rem;">⚠️ Este reporte es generado por inteligencia artificial y puede contener imprecisiones. Debe ser interpretado por un profesionista de salud.</div>
+                </div>
                 <div class="reporte-campo">
                     <div class="reporte-label">Fecha y hora</div>
                     <div class="reporte-valor">${r.fecha_hora} — Duracion: ${r.duracion_minutos} min — Turnos: ${r.total_turnos}</div>
