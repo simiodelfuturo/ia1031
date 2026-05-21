@@ -34,3 +34,7 @@ Nemi no sustituye la atención profesional ni toma decisiones clínicas. Su func
 3. Instala dependencias: `pip install -r requirements.txt`
 4. Corre el servidor: `python app.py`
 5. Abre `http://127.0.0.1:5000` en el navegador
+
+## Demo
+1. https://youtu.be/AYxVRBBQKk4
+2. https://youtu.be/sP_iVRdht80
