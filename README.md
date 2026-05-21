@@ -1,12 +1,12 @@
-# Nemi — Asistente de Orientación en Crisis
+# Nemi — Asistente de Orientación y Triage en Salud Mental
 
 ## ¿Qué es Nemi?
-Nemi es un asistente conversacional de orientación y triage emocional para público general en México. Está representado por un ajolote y su nombre viene del náhuatl: "vivir y caminar".
+Nemi es un asistente conversacional de orientación y triage en salud mental para público general en México. Está representado por un ajolote y su nombre viene del náhuatl: "vivir y caminar".
 
 ## ¿Por qué usamos AI?
-La inteligencia artificial permite que Nemi procese lenguaje natural para identificar el dominio de malestar predominante de una persona en crisis, orientarla hacia los recursos de apoyo correctos y generar un reporte clínico estructurado para el profesionista que la atienda después.
+La inteligencia artificial permite que Nemi procese lenguaje natural para identificar el dominio de malestar predominante, orientar hacia recursos de apoyo y generar un reporte estructurado para el profesionista que atienda después.
 
-Sin AI, este proceso requeriría un profesionista disponible en tiempo real. Con AI, Nemi puede operar como primera línea de contacto las 24 horas, reduciendo la barrera de acceso a orientación en salud mental y crisis.
+Nemi no sustituye la atención profesional ni toma decisiones clínicas. Su función es reducir la barrera de acceso a orientación inicial y facilitar la derivación al recurso adecuado. Como toda herramienta de IA, puede cometer errores y debe ser supervisada por profesionistas de salud.
 
 ## ¿Para qué usamos AI?
 - Identificar el dominio de origen del malestar según el Modelo RADAR 5 (Biológico, Material, Trauma, Relacional, Psicológico/Significado)
